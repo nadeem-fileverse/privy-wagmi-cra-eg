@@ -1,25 +1,38 @@
-import logo from './logo.svg';
-import './App.css';
+import "./App.css";
+import { useConnectWallet, usePrivy, useWallets } from "@privy-io/react-auth";
+import { useAccount } from "wagmi";
 
 function App() {
+  const { ready: privyReady } = usePrivy();
+  const { ready: walletsReady } = useWallets();
+  const addressFromWagmi = useAccount().address;
+  console.log({ privyReady, walletsReady, addressFromWagmi });
+  const isLoading = !privyReady || !walletsReady;
+
+  if (isLoading) return <div className="App">Loading...</div>;
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <DemoComponent />
     </div>
   );
 }
+
+const DemoComponent = () => {
+  const { connectWallet } = useConnectWallet();
+  const addressFromWagmi = useAccount().address;
+  if (addressFromWagmi) {
+    return (
+      <div>
+        <p>Connected Address: {addressFromWagmi}</p>
+      </div>
+    );
+  }
+
+  return (
+    <button onClick={connectWallet} className="button">
+      Connect Wallet
+    </button>
+  );
+};
 
 export default App;
